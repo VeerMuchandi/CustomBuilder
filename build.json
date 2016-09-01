@@ -1,0 +1,149 @@
+{
+    "kind": "List",
+    "apiVersion": "v1",
+    "metadata": {},
+    "items": [
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "customdockerbuilder",
+                "creationTimestamp": null,
+                "labels": {
+                    "build": "time"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewBuild"
+                }
+            },
+            "spec": {
+                "tags": [
+                    {
+                        "name": "latest",
+                        "annotations": {
+                            "openshift.io/imported-from": "veermuchandi/customdockerbuilder"
+                        },
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "veermuchandi/customdockerbuilder"
+                        },
+                        "generation": null,
+                        "importPolicy": {}
+                    }
+                ]
+            },
+            "status": {
+                "dockerImageRepository": ""
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "time",
+                "creationTimestamp": null,
+                "labels": {
+                    "build": "time"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewBuild"
+                }
+            },
+            "spec": {},
+            "status": {
+                "dockerImageRepository": ""
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "time",
+                "creationTimestamp": null,
+                "labels": {
+                    "build": "time"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewBuild"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "Tcmylw2wNf14G88MiZgi"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "A4thavXBpsGQoGRjjWD7"
+                        }
+                    },
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    }
+                ],
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "git://github.com/VeerMuchandi/time.git"
+                    },
+                    "contextDir": "busybox",
+                    "secrets": [
+                        {
+                            "secret": {
+                                "name": "scmsecret"
+                            },
+                            "destinationDir": "."
+                        }
+                    ]
+                },
+                "strategy": {
+                    "type": "Custom",
+                    "customStrategy": {
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "veermuchandi/customdockerbuilder:latest"
+                        },
+                        "exposeDockerSocket": true,
+                        "env": [
+                            {
+                                "name": "TARGET_GIT_REPOSITORY",
+                                "value": "git@github.com:VeerMuchandi/tmpdocimages.git"
+                            },
+                            {
+                                "name": "USER_NAME",
+                                "value": "Veer Muchandi"
+                            },
+                            {
+                                "name": "USER_EMAIL",
+                                "value": "veer@example.com"
+                            },
+                            {
+                                "name": "OPENSHIFT_CUSTOM_BUILD_BASE_IMAGE",
+                                "value": "veermuchandi/customdockerbuilder"
+                            }
+                        ]
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "time:latest"
+                    }
+                },
+                "resources": {},
+                "postCommit": {}
+            },
+            "status": {
+                "lastVersion": 0
+            }
+        }
+    ]
+}

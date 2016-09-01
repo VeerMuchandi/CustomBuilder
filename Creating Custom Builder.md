@@ -1,3 +1,48 @@
+## Creating Custom Builder
+
+First we will learn how to create this Custom builder image in 3 steps:
+
+#### Step 1: Create a Dockerfile
+
+We will start by creating a Dockerfile for our custom builder. I am pulling this example from `https://github.com/openshift/origin/tree/master/images/builder/docker/custom-docker-builder` and further customizing it for our needs.
+
+Note that this Dockerfile uses `openshift/origin-base` as the base image. This is a CentOS based image coming from here `https://github.com/openshift/origin/tree/master/images/base`. For enterprise use you would use a RHEL based image. 
+
+Here is how your Dockerfile would look like: 
+
+
+``` 
+# This creates a custom docker builder image that invokes build.sh which includes
+# the custom code to build your own image.
+# this is a customization of example posted here:
+# https://github.com/openshift/origin/tree/master/images/builder/docker/custom-docker-builder
+#
+# This image expects to have the Docker socket bind-mounted into the container.
+# If "/root/.dockercfg" is bind mounted in, it will use that as authorization
+# to a Docker registry.
+#
+#
+FROM openshift/origin-base
+
+RUN INSTALL_PKGS="gettext automake make docker" && \
+    yum install -y $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum clean all
+
+LABEL io.k8s.display-name="OpenShift Custom Builder Example" \
+      io.k8s.description="This is an example of a custom builder for use with OpenShift"
+ENV HOME=/root
+COPY build.sh /tmp/build.sh
+CMD ["/tmp/build.sh"]
+```
+
+#### Step 2: Create a custom build script
+
+This is where the meat of our customization is. The Dockerfile in the previous step would copy a file with name build.sh into /tmp and executes it when it runs. All our customization logic would be in this file.
+
+Here is our build.sh script.
+
+```
 #!/bin/bash
 
 # This custom build script takes a Dockerfile as input from the source repository, runs a DockerBuild and pushes the resultant 
@@ -119,5 +164,59 @@ if [ -n "${OUTPUT_IMAGE}" ] && [ -n "${TARGET_GIT_REPOSITORY}" ] ; then
 	popd
 	rm -rf "${TMP_DIR}"
 fi
+```
 
+Now that we have the build file, make sure that it is  executable:
+
+```
+chmod +x build.sh
+```
+
+#### Step 3: Build the Custom Builder to create a Custom builder image
+
+This is a simple Docker Build process. You will use docker build process. Tag your image with whatever name you wish and push into a Docker Registry of your choice. In my case, I called it `customdockerbuilder` and I am pushing this to DockerHub into my user space. If you are pushing to DockerHub like I am doing here you would replace this image tag as `<yourid>/customdockerbuilder`. 
+
+**Note** If you are using a RHEL based image as the base image in your Dockerfile in Step 1 above, you cannot push it to DockerHub. You will have to push into your private repository. Also RHEL based image can only be built on a RHEL boxed that is subscribed to Red Hat.
+
+**Note** Also note that if you are pushing into a private registry, it must be accessible from the OpenShift Cluster.
+ 
+
+So, run `docker build`  first as shown below
+
+```
+$ docker build -t "veermuchandi/customdockerbuilder" .
+Sending build context to Docker daemon 24.58 kB
+Step 1 : FROM openshift/origin-base
+ ---> 7adf39ecb52a
+Step 2 : RUN INSTALL_PKGS="gettext automake make docker" &&     yum install -y $INSTALL_PKGS &&     rpm -V $INSTALL_PKGS &&     yum clean all
+ ---> Using cache
+ ---> 700ffccc3da6
+Step 3 : LABEL io.k8s.display-name "OpenShift Origin Custom Builder Example" io.k8s.description "This is an example of a custom builder for use with OpenShift Origin."
+ ---> Using cache
+ ---> 2c72f586f412
+Step 4 : ENV HOME /root
+ ---> Using cache
+ ---> ff6f267c81cd
+Step 5 : COPY build.sh /tmp/build.sh
+ ---> 9c1f3dd76d5d
+Removing intermediate container f10056f24eb2
+Step 6 : CMD /tmp/build.sh
+ ---> Running in 05c735f6dbcc
+ ---> 9d5e6ee2cfdc
+Removing intermediate container 05c735f6dbcc
+Successfully built 9d5e6ee2cfdc
+```
+
+You can verify the images by running `docker images` on your workstation.  Now it is time to push this image to the registry by running `docker push`.
+
+
+```
+$ docker push veermuchandi/customdockerbuilder
+```
+
+Once `docker push` is complete verify your image is in the registry.
+
+And that's it!! Your custom builder is ready to use :)
+
+In the next chapter, we will discuss how to use this image.
 
