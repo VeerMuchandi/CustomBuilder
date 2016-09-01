@@ -40,7 +40,7 @@ CMD ["/tmp/build.sh"]
 
 This is where the meat of our customization is. The Dockerfile in the previous step would copy a file with name build.sh into /tmp and executes it when it runs. All our customization logic would be in this file.
 
-Here is our build.sh script.
+Here is our build.sh script. This is a simple script.  I encourage you to read the comments at the beginning of the script and understand what it does as this is the key to our custom builder. This is just a sample script and written pretty raw. I may improve this further. The latest version of this script is checked into the github repository at [https://github.com/VeerMuchandi/CustomBuilder]()
 
 ```
 #!/bin/bash

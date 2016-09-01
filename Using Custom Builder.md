@@ -215,7 +215,9 @@ If you have successfully run the above command you should see a `build.json` fil
 
 ```
 
-**Note** that at this point we only have build configuration as a file. Build configuration object is not created in your project yet. Your project is still empty.
+
+
+**Note** that at this point we only have build configuration as a file. Build configuration object is not created in your project yet. Your project is still empty. For convenience I am also checking in my build.json as an example into the git repository  [https://github.com/VeerMuchandi/CustomBuilder]()
 
 
 

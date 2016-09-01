@@ -4,7 +4,7 @@ The Custom build strategy allows developers to define a specific builder image r
 
 OpenShift documentation here explains more about the custom builder: [https://docs.openshift.com/enterprise/3.2/creating_images/custom.html]()
 
-Here we will learn to create and use an OpenShift Custom Builder with an example. 
+Here we will learn to create and use an OpenShift Custom Builder with an example. This code example, custom builder docker file, the builder script, and all relevant material is available on github at [https://github.com/VeerMuchandi/CustomBuilder]()
 
 
 **What customization are we doing in this exercise?** 
